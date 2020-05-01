@@ -43,6 +43,7 @@ object flightData {
       |LIMIT 5""".stripMargin)
 
   sortedGrouped.write
+      .format("csv")
                 .mode("overwrite")
                 .save("src/main/Resources")
 
