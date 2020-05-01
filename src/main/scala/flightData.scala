@@ -1,9 +1,9 @@
 import org.apache.spark.sql.{Dataset, Row}
+import org.apache.spark.sql.functions._
 
 object flightData {
 
   import org.apache.spark.sql.{DataFrame, SparkSession}
-
 
     private val spark: SparkSession = SparkSession.builder()
       .master("local")
@@ -11,7 +11,7 @@ object flightData {
       .appName("flight data app")
       .getOrCreate()
 
-    spark.sparkContext.setLogLevel("ERROR")
+  spark.sparkContext.setLogLevel("ERROR")
 
   val flightsDF: DataFrame = spark.read
     .format("csv")
@@ -42,7 +42,9 @@ object flightData {
       |ORDER BY sum(count) DESC
       |LIMIT 5""".stripMargin)
 
-  import org.apache.spark.sql.functions.desc
+  sortedGrouped.write
+                .mode("overwrite")
+                .save("src/main/Resources")
 
   val scalaWay1: Dataset[Row] = flightsDF.groupBy("DEST_COUNTRY_NAME")
                           .sum("count")
@@ -52,11 +54,11 @@ object flightData {
 
 
   def main(args: Array[String]): Unit={
+
     flightsDF.show(5)
     flightsDF.sort("count").explain()
     sortedflightsDF.show()
     sqlWay.show()
-
     sortedGrouped.show(5)
     scalaWay1.show()
 
